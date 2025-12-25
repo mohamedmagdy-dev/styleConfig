@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VLESS Config Converter</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        color: #e5e7eb;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+      }
+      .card {
+        background: #020617;
+        padding: 20px;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 700px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+      h1 {
+        margin-top: 0;
+        font-size: 22px;
+        text-align: center;
+      }
+      textarea {
+        width: 100%;
+        min-height: 120px;
+        background: #020617;
+        border: 1px solid #334155;
+        border-radius: 10px;
+        color: #e5e7eb;
+        padding: 10px;
+        font-size: 14px;
+        resize: vertical;
+      }
+      button {
+        width: 100%;
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 12px;
+        border: none;
+        font-size: 15px;
+        cursor: pointer;
+      }
+      .convert {
+        background: #2563eb;
+        color: white;
+      }
+      .copy {
+        background: #16a34a;
+        color: white;
+      }
+      .footer {
+        text-align: center;
+        font-size: 12px;
+        margin-top: 10px;
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>🔁 VLESS Config Converter</h1>
+
+      <label>الكونفج الأصلي:</label>
+      <textarea id="input" placeholder="vless://..."></textarea>
+
+      <button class="convert" onclick="convert()">تحويل الكونفج</button>
+
+      <label style="margin-top: 10px; display: block"
+        >الكونفج بعد التحويل:</label
+      >
+      <textarea id="output" readonly></textarea>
+
+      <button class="copy" onclick="copyResult()">📋 نسخ إلى Clipboard</button>
+
+      <div class="footer">VLESS Reference Converter – ekb.eg</div>
+    </div>
+
+    <script>
+      function convert() {
+        const input = document.getElementById("input").value.trim();
+        if (!input.startsWith("vless://")) {
+          alert("الكونفج غير صحيح");
+          return;
+        }
+
+        const [main, tag = ""] = input.split("#");
+        const clean = main.replace("vless://", "");
+        const [uuidPart, rest] = clean.split("@");
+        const [hostPort] = rest.split("?");
+
+        const referenceParams = [
+          "type=ws",
+          "security=tls",
+          "fp=chrome",
+          "alpn=h2,http/1.1",
+          "allowInsecure=1",
+          "sni=speedtest.net",
+          "path=/vpnjantit",
+          "encryption=none",
+        ].join("&");
+
+        const result = `vless://${uuidPart}@${hostPort}?${referenceParams}${
+          tag ? "#" + tag : ""
+        }`;
+        document.getElementById("output").value = result;
+      }
+
+      function copyResult() {
+        const output = document.getElementById("output");
+        output.select();
+        document.execCommand("copy");
+        alert("تم النسخ بنجاح ✅");
+      }
+    </script>
+  </body>
+</html>
